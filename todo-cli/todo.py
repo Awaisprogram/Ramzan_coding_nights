@@ -26,7 +26,7 @@ def add(task):
   tasks = load_tasks()
   tasks.append({"task":task,"done": False})
   save_task(tasks)
-  click.echo(f"Task added: {task}")
+  click.echo(click.style(f"Task added {task}", fg="green", bold=True))
 
 @click.command
 def list():
@@ -37,7 +37,7 @@ def list():
       return
     for index, task in enumerate(tasks, 1):
       status = "✅" if task["done"] else "❌"
-      click.echo(f"{index}. {task["task"]} [{status}]")   
+      click.echo(click.style(f"{index}. {task["task"]} : [{status}]", fg="green", bold=True))  
 
 @click.command()
 @click.argument("task_number", type=int)
@@ -47,9 +47,9 @@ def complete(task_number):
     if 0 < task_number <= len(tasks):
         tasks[task_number - 1]["done"] = True
         save_task(tasks)
-        click.echo(f"Task {task_number} marked as completed.")
+         click.echo(click.style(f"Task {task_number} marked as completed.", fg="green", bold=True))
     else:
-        click.echo(f"Invalid task number: {task_number}")
+        click.echo(click.style(f"Invalid task number: {task_number}", fg="red", bold=True))
         
 @click.command()
 @click.argument("task_number", type=int)
@@ -59,9 +59,9 @@ def remove(task_number):
     if 0 < task_number <= len(tasks):
         removed_task = tasks.pop(task_number - 1)
         save_task(tasks)
-        click.echo(f"Removed task: {removed_task['task']}")
+        click.echo(click.style(f"Removed task {removed_task['task']}", fg="red", bold=True))
     else:
-        click.echo(f"Invalid task number: {task_number}")
+        click.echo(click.style(f"Invalid task number: {task_number}", fg="red", bold=True))
 
 cli.add_command(add)
 cli.add_command(list)
