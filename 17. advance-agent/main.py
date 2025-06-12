@@ -21,42 +21,30 @@ provider = AsyncOpenAI(
 # Configure the language model
 model = OpenAIChatCompletionsModel(model="gemini-2.0-flash", openai_client=provider)
 
-
-@function_tool("get_asharib_data")
-def get_asharib_data() -> str:
+@function_tool
+def get_weather(city: str) -> str:
     """
-    Fetches profile data about Asharib Ali from his personal API endpoint.
-
-    This function makes a request to Asharib's profile API and returns information
-    about his background, skills, projects, education, work experience, and achievements.
-
-    Returns:
-        str: JSON string containing Asharib Ali's profile information
+    Get the current weather for a given city.
     """
-
     try:
-        response = requests.get("https://www.asharib.xyz/api/profile")
-        if response.status_code == 200:
-            return response.text
-        else:
-            return f"Error fetching data: Status code {response.status_code}"
+        result = requests.get(
+            f"http://api.weatherapi.com/v1/current.json?key=8e3aca2b91dc4342a1162608252604&q={city}"
+        )
+        data = result.json()
+        return f"The current weather in {city} is {data['current']['temp_c']}°C with {data['current']['condition']['text']}."
     except Exception as e:
-        return f"Error fetching data: {str(e)}"
+        return f"Could not fetch weather data due to: {str(e)}"
 
 
 agent = Agent(
     name="Greeting Agent",
-    instructions="""You are a Greeting Agent designed to provide friendly interactions and information about Asharib Ali.
+    instructions="""You are an agent that work for only weather
 
 Your responsibilities:
-1. Greet users warmly when they say hello (respond with 'Salam from Asharib Ali')
-2. Say goodbye appropriately when users leave (respond with 'Allah Hafiz from Asharib Ali')
-3. When users request information about Asharib Ali, use the get_asharib_data tool to retrieve and share his profile information
-4. For any questions not related to greetings or Asharib Ali, politely explain: 'I'm only able to provide greetings and information about Asharib Ali. I can't answer other questions at this time.'
-
+ You tell the weather of city for user asked
 Always maintain a friendly, professional tone and ensure responses are helpful within your defined scope.""",
     model=model,
-    tools=[get_asharib_data],
+    tools=[get_weather],
 )
 
 
